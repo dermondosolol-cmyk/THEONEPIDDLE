@@ -125,12 +125,65 @@ for (let itemNumber = 1; itemNumber <= 180; itemNumber++) {
 
 // Music Playlist Configuration (Free Music)
 const MUSIC_TRACKS = [
+    // SoundHelix Tracks
     { name: 'Neon Vibes', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
     { name: 'Electric Dreams', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
     { name: 'Retro Synth', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
     { name: 'Drift Kings', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
     { name: 'Night Speed', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-    { name: 'Highway Lights', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' }
+    { name: 'Highway Lights', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+    { name: 'Turbo Rush', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+    { name: 'Cyber Speed', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+    
+    // Bensound Tracks
+    { name: 'Ukulele', url: 'https://www.bensound.com/bensound-music/bensound-ukulele.mp3' },
+    { name: 'Sunny', url: 'https://www.bensound.com/bensound-music/bensound-sunny.mp3' },
+    { name: 'Energy', url: 'https://www.bensound.com/bensound-music/bensound-energy.mp3' },
+    { name: 'Animato', url: 'https://www.bensound.com/bensound-music/bensound-anilato.mp3' },
+    { name: 'Deepdive', url: 'https://www.bensound.com/bensound-music/bensound-deepdive.mp3' },
+    { name: 'Buddy', url: 'https://www.bensound.com/bensound-music/bensound-buddy.mp3' },
+    { name: 'Funky', url: 'https://www.bensound.com/bensound-music/bensound-funkytown.mp3' },
+    { name: 'Funnysong', url: 'https://www.bensound.com/bensound-music/bensound-funnysong.mp3' },
+    { name: 'Gooey', url: 'https://www.bensound.com/bensound-music/bensound-gooey.mp3' },
+    { name: 'Hipjazz', url: 'https://www.bensound.com/bensound-music/bensound-hipjazz.mp3' },
+    { name: 'Hollowknight', url: 'https://www.bensound.com/bensound-music/bensound-hollowknight.mp3' },
+    { name: 'Jazzcomedy', url: 'https://www.bensound.com/bensound-music/bensound-jazzcomedy.mp3' },
+    { name: 'Jazzycomedy', url: 'https://www.bensound.com/bensound-music/bensound-jazzycomedy.mp3' },
+    { name: 'Littleidea', url: 'https://www.bensound.com/bensound-music/bensound-littleidea.mp3' },
+    { name: 'Memories', url: 'https://www.bensound.com/bensound-music/bensound-memories.mp3' },
+    { name: 'Midieval', url: 'https://www.bensound.com/bensound-music/bensound-midieval.mp3' },
+    { name: 'Mohan', url: 'https://www.bensound.com/bensound-music/bensound-mohan.mp3' },
+    { name: 'Monkeysspan', url: 'https://www.bensound.com/bensound-music/bensound-monkeysspan.mp3' },
+    { name: 'Motivational', url: 'https://www.bensound.com/bensound-music/bensound-motivational.mp3' },
+    { name: 'Ofelias dream', url: 'https://www.bensound.com/bensound-music/bensound-ofeliasdream.mp3' },
+    { name: 'Pixelland', url: 'https://www.bensound.com/bensound-music/bensound-pixelland.mp3' },
+    { name: 'Radical', url: 'https://www.bensound.com/bensound-music/bensound-radical.mp3' },
+    { name: 'Scifi', url: 'https://www.bensound.com/bensound-music/bensound-scifi.mp3' },
+    { name: 'Sci-fi', url: 'https://www.bensound.com/bensound-music/bensound-sci-fi.mp3' },
+    { name: 'Shortcut', url: 'https://www.bensound.com/bensound-music/bensound-shortcut.mp3' },
+    { name: 'Sneaky', url: 'https://www.bensound.com/bensound-music/bensound-sneaky.mp3' },
+    { name: 'Sunny day', url: 'https://www.bensound.com/bensound-music/bensound-sunnyday.mp3' },
+    { name: 'The elevator', url: 'https://www.bensound.com/bensound-music/bensound-theelevator.mp3' },
+    { name: 'Ukulele Vibe', url: 'https://www.bensound.com/bensound-music/bensound-ukulele2.mp3' },
+    { name: 'Wakaba', url: 'https://www.bensound.com/bensound-music/bensound-wakaba.mp3' },
+    { name: 'Xmas', url: 'https://www.bensound.com/bensound-music/bensound-xmas.mp3' },
+    { name: 'Zimmer', url: 'https://www.bensound.com/bensound-music/bensound-zimmer.mp3' },
+    
+    // Additional Racing/Action themed names
+    { name: 'Turbo Charged', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+    { name: 'Midnight Racer', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+    { name: 'City Streets', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+    { name: 'Neon Nights', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+    { name: 'Fast Lane', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+    { name: 'Adrenaline Rush', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+    { name: 'Velocity', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+    { name: 'Nitro Boost', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+    { name: 'Underground Beat', url: 'https://www.bensound.com/bensound-music/bensound-energy.mp3' },
+    { name: 'Sonic Pulse', url: 'https://www.bensound.com/bensound-music/bensound-scifi.mp3' },
+    { name: 'Drift Fever', url: 'https://www.bensound.com/bensound-music/bensound-anilato.mp3' },
+    { name: 'Chrome & Steel', url: 'https://www.bensound.com/bensound-music/bensound-radical.mp3' },
+    { name: 'Synthetic Drive', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+    { name: 'Urban Legends', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
 ];
 
 // Game State
