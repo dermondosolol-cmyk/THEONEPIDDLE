@@ -4,8 +4,48 @@ let CANVAS_HEIGHT = window.innerHeight;
 const ROAD_EDGE = 50;
 
 // Upgrades Configuration
+const UPGRADE_CATEGORIES = {
+    performance: {
+        name: '⚡ Performance',
+        description: 'Boost your car\'s core performance'
+    },
+    handling: {
+        name: '🎯 Handling',
+        description: 'Improve control and maneuverability'
+    },
+    utility: {
+        name: '🛡️ Utility',
+        description: 'Special abilities and protection'
+    },
+    decal: {
+        name: '🎨 Decals',
+        description: 'Cosmetic visual upgrades'
+    },
+    engine: {
+        name: '🔧 Engine',
+        description: 'Engine and mechanical upgrades'
+    },
+    suspension: {
+        name: '🛞 Suspension',
+        description: 'Tire and grip upgrades'
+    },
+    wheels: {
+        name: '⭕ Wheels',
+        description: 'Rim and wheel upgrades'
+    },
+    exhaust: {
+        name: '💨 Exhaust',
+        description: 'Exhaust system upgrades'
+    },
+    chassis: {
+        name: '🏗️ Chassis',
+        description: 'Frame and structure upgrades'
+    }
+};
+
 const UPGRADES = {
     speed: {
+        category: 'performance',
         name: "Max Speed",
         description: "Increase maximum speed",
         baseCost: 100,
@@ -14,6 +54,7 @@ const UPGRADES = {
         effect: (level) => 8 + level * 0.5
     },
     acceleration: {
+        category: 'performance',
         name: "Acceleration",
         description: "Improve acceleration rate",
         baseCost: 80,
@@ -22,6 +63,7 @@ const UPGRADES = {
         effect: (level) => 0.3 + level * 0.02
     },
     handling: {
+        category: 'handling',
         name: "Handling",
         description: "Better turn control",
         baseCost: 120,
@@ -30,6 +72,7 @@ const UPGRADES = {
         effect: (level) => 0.08 + level * 0.01
     },
     driftBoost: {
+        category: 'performance',
         name: "Drift Multiplier",
         description: "Increase drift score multiplier",
         baseCost: 150,
@@ -38,6 +81,7 @@ const UPGRADES = {
         effect: (level) => 1 + level * 0.3
     },
     coinMagnet: {
+        category: 'utility',
         name: "Coin Magnet",
         description: "Attract coins from further away",
         baseCost: 200,
@@ -46,6 +90,7 @@ const UPGRADES = {
         effect: (level) => 100 + level * 50
     },
     shieldHP: {
+        category: 'utility',
         name: "Shield HP",
         description: "Extra protection hit points",
         baseCost: 180,
@@ -56,17 +101,19 @@ const UPGRADES = {
 };
 
 const SHOP_ITEM_TYPES = [
-    ['Neon Decal', 'Give your car a sharper look'],
-    ['Engine Tune', 'Fine-tune the engine response'],
-    ['Tire Compound', 'Refresh the grip setup'],
-    ['Rim Set', 'Swap in a lighter rim set'],
-    ['Exhaust Kit', 'Add a more aggressive exhaust note'],
-    ['Chassis Plate', 'Reinforce the frame finish']
+    ['Neon Decal', 'Give your car a sharper look', 'decal'],
+    ['Engine Tune', 'Fine-tune the engine response', 'engine'],
+    ['Tire Compound', 'Refresh the grip setup', 'suspension'],
+    ['Rim Set', 'Swap in a lighter rim set', 'wheels'],
+    ['Exhaust Kit', 'Add a more aggressive exhaust note', 'exhaust'],
+    ['Chassis Plate', 'Reinforce the frame finish', 'chassis']
 ];
 
 for (let itemNumber = 1; itemNumber <= 180; itemNumber++) {
-    const [itemType, itemDescription] = SHOP_ITEM_TYPES[(itemNumber - 1) % SHOP_ITEM_TYPES.length];
+    const itemTypeData = SHOP_ITEM_TYPES[(itemNumber - 1) % SHOP_ITEM_TYPES.length];
+    const [itemType, itemDescription, category] = itemTypeData;
     UPGRADES[`shopItem${itemNumber}`] = {
+        category: category,
         name: `${itemType} ${itemNumber}`,
         description: itemDescription,
         baseCost: 25 + itemNumber * 5,
@@ -160,40 +207,75 @@ function updateShopDisplay() {
     const upgradesList = document.getElementById('upgradesList');
     upgradesList.innerHTML = '';
     
+    // Group upgrades by category
+    const upgradedByCategory = {};
     Object.keys(UPGRADES).forEach(key => {
         const upgrade = UPGRADES[key];
-        const level = gameState.upgrades[key];
-        const maxLevel = upgrade.maxLevel;
-        const cost = getUpgradeCost(key);
-        const canBuy = gameState.coins >= cost && level < maxLevel;
+        const category = upgrade.category || 'other';
+        if (!upgradedByCategory[category]) {
+            upgradedByCategory[category] = [];
+        }
+        upgradedByCategory[category].push({ key, upgrade });
+    });
+    
+    // Display each category with its upgrades
+    Object.keys(UPGRADE_CATEGORIES).forEach(categoryKey => {
+        if (!upgradedByCategory[categoryKey] || upgradedByCategory[categoryKey].length === 0) {
+            return; // Skip empty categories
+        }
         
-        const item = document.createElement('div');
-        item.className = 'upgradeItem' + (level >= maxLevel ? ' maxed' : '');
+        const category = UPGRADE_CATEGORIES[categoryKey];
         
-        const upgradeName = document.createElement('div');
-        upgradeName.className = 'upgradeName';
-        upgradeName.innerHTML = `<span>${upgrade.name}</span><span>${cost} coins</span>`;
+        // Create category header
+        const categoryHeader = document.createElement('div');
+        categoryHeader.className = 'categoryHeader';
+        categoryHeader.innerHTML = `
+            <h3>${category.name}</h3>
+            <p>${category.description}</p>
+        `;
+        upgradesList.appendChild(categoryHeader);
         
-        const desc = document.createElement('div');
-        desc.className = 'upgradeDesc';
-        desc.textContent = upgrade.description;
+        // Create category container
+        const categoryContainer = document.createElement('div');
+        categoryContainer.className = 'categoryContainer';
         
-        const levelInfo = document.createElement('div');
-        levelInfo.className = 'upgradeLevel';
-        levelInfo.textContent = `Level: ${level}/${maxLevel}`;
+        // Add each upgrade in this category
+        upgradedByCategory[categoryKey].forEach(({ key, upgrade }) => {
+            const level = gameState.upgrades[key];
+            const maxLevel = upgrade.maxLevel;
+            const cost = getUpgradeCost(key);
+            const canBuy = gameState.coins >= cost && level < maxLevel;
+            
+            const item = document.createElement('div');
+            item.className = 'upgradeItem' + (level >= maxLevel ? ' maxed' : '');
+            
+            const upgradeName = document.createElement('div');
+            upgradeName.className = 'upgradeName';
+            upgradeName.innerHTML = `<span>${upgrade.name}</span><span>${cost} coins</span>`;
+            
+            const desc = document.createElement('div');
+            desc.className = 'upgradeDesc';
+            desc.textContent = upgrade.description;
+            
+            const levelInfo = document.createElement('div');
+            levelInfo.className = 'upgradeLevel';
+            levelInfo.textContent = `Level: ${level}/${maxLevel}`;
+            
+            const button = document.createElement('button');
+            button.className = 'upgradeButton' + (level >= maxLevel ? ' maxed' : '');
+            button.textContent = level >= maxLevel ? 'MAX LEVEL' : `Buy for ${cost} coins`;
+            button.disabled = !canBuy;
+            button.onclick = () => purchaseUpgrade(key);
+            
+            item.appendChild(upgradeName);
+            item.appendChild(desc);
+            item.appendChild(levelInfo);
+            item.appendChild(button);
+            
+            categoryContainer.appendChild(item);
+        });
         
-        const button = document.createElement('button');
-        button.className = 'upgradeButton' + (level >= maxLevel ? ' maxed' : '');
-        button.textContent = level >= maxLevel ? 'MAX LEVEL' : `Buy for ${cost} coins`;
-        button.disabled = !canBuy;
-        button.onclick = () => purchaseUpgrade(key);
-        
-        item.appendChild(upgradeName);
-        item.appendChild(desc);
-        item.appendChild(levelInfo);
-        item.appendChild(button);
-        
-        upgradesList.appendChild(item);
+        upgradesList.appendChild(categoryContainer);
     });
 }
 

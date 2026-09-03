@@ -314,8 +314,33 @@ body {
 .upgradesList {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 15px;
     margin-bottom: 20px;
+}
+
+.categoryHeader {
+    margin-top: 10px;
+    margin-bottom: 5px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #00ff88;
+}
+
+.categoryHeader h3 {
+    color: #00ff88;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.categoryHeader p {
+    color: #888;
+    font-size: 12px;
+    font-style: italic;
+}
+
+.categoryContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .upgradeItem {
