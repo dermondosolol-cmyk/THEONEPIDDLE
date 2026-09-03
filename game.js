@@ -129,7 +129,8 @@ let gameState = {
     score: 0,
     multiplier: 1,
     gameActive: false,
-    upgrades: {}
+    upgrades: {},
+    selectedCategory: 'performance'
 };
 
 let musicContext = null;
@@ -153,6 +154,7 @@ function loadGame() {
                 upgrades[key] = Number.isFinite(savedLevel) ? savedLevel : 0;
                 return upgrades;
             }, {});
+            gameState.selectedCategory = data.selectedCategory || 'performance';
         } catch (error) {
             localStorage.removeItem('driftMasterGame');
         }
@@ -163,7 +165,8 @@ function loadGame() {
 function saveGame() {
     localStorage.setItem('driftMasterGame', JSON.stringify({
         coins: gameState.coins,
-        upgrades: gameState.upgrades
+        upgrades: gameState.upgrades,
+        selectedCategory: gameState.selectedCategory
     }));
 }
 
@@ -204,6 +207,44 @@ function purchaseUpgrade(upgradeKey) {
 function updateShopDisplay() {
     document.getElementById('shopCoins').textContent = gameState.coins;
     
+    // Create category tabs if they don't exist
+    let categoryTabs = document.getElementById('categoryTabs');
+    if (!categoryTabs) {
+        const shopPanel = document.getElementById('shopPanel');
+        const coinsInfo = shopPanel.querySelector('.coinsInfo');
+        
+        categoryTabs = document.createElement('div');
+        categoryTabs.id = 'categoryTabs';
+        categoryTabs.className = 'categoryTabs';
+        
+        Object.keys(UPGRADE_CATEGORIES).forEach(categoryKey => {
+            const category = UPGRADE_CATEGORIES[categoryKey];
+            const button = document.createElement('button');
+            button.className = 'categoryTab';
+            button.textContent = category.name;
+            button.onclick = () => {
+                gameState.selectedCategory = categoryKey;
+                saveGame();
+                updateShopDisplay();
+            };
+            categoryTabs.appendChild(button);
+        });
+        
+        coinsInfo.parentNode.insertBefore(categoryTabs, coinsInfo.nextSibling);
+    }
+    
+    // Update active tab
+    document.querySelectorAll('.categoryTab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    const selectedCategoryName = UPGRADE_CATEGORIES[gameState.selectedCategory]?.name;
+    document.querySelectorAll('.categoryTab').forEach(tab => {
+        if (tab.textContent === selectedCategoryName) {
+            tab.classList.add('active');
+        }
+    });
+    
     const upgradesList = document.getElementById('upgradesList');
     upgradesList.innerHTML = '';
     
@@ -218,65 +259,67 @@ function updateShopDisplay() {
         upgradedByCategory[category].push({ key, upgrade });
     });
     
-    // Display each category with its upgrades
-    Object.keys(UPGRADE_CATEGORIES).forEach(categoryKey => {
-        if (!upgradedByCategory[categoryKey] || upgradedByCategory[categoryKey].length === 0) {
-            return; // Skip empty categories
-        }
+    // Display only selected category
+    const selectedCategory = gameState.selectedCategory;
+    const category = UPGRADE_CATEGORIES[selectedCategory];
+    
+    if (!upgradedByCategory[selectedCategory] || upgradedByCategory[selectedCategory].length === 0) {
+        const empty = document.createElement('div');
+        empty.textContent = 'No upgrades in this category';
+        upgradesList.appendChild(empty);
+        return;
+    }
+    
+    // Create category header
+    const categoryHeader = document.createElement('div');
+    categoryHeader.className = 'categoryHeader';
+    categoryHeader.innerHTML = `
+        <h3>${category.name}</h3>
+        <p>${category.description}</p>
+    `;
+    upgradesList.appendChild(categoryHeader);
+    
+    // Create category container
+    const categoryContainer = document.createElement('div');
+    categoryContainer.className = 'categoryContainer';
+    
+    // Add each upgrade in this category
+    upgradedByCategory[selectedCategory].forEach(({ key, upgrade }) => {
+        const level = gameState.upgrades[key];
+        const maxLevel = upgrade.maxLevel;
+        const cost = getUpgradeCost(key);
+        const canBuy = gameState.coins >= cost && level < maxLevel;
         
-        const category = UPGRADE_CATEGORIES[categoryKey];
+        const item = document.createElement('div');
+        item.className = 'upgradeItem' + (level >= maxLevel ? ' maxed' : '');
         
-        // Create category header
-        const categoryHeader = document.createElement('div');
-        categoryHeader.className = 'categoryHeader';
-        categoryHeader.innerHTML = `
-            <h3>${category.name}</h3>
-            <p>${category.description}</p>
-        `;
-        upgradesList.appendChild(categoryHeader);
+        const upgradeName = document.createElement('div');
+        upgradeName.className = 'upgradeName';
+        upgradeName.innerHTML = `<span>${upgrade.name}</span><span>${cost} coins</span>`;
         
-        // Create category container
-        const categoryContainer = document.createElement('div');
-        categoryContainer.className = 'categoryContainer';
+        const desc = document.createElement('div');
+        desc.className = 'upgradeDesc';
+        desc.textContent = upgrade.description;
         
-        // Add each upgrade in this category
-        upgradedByCategory[categoryKey].forEach(({ key, upgrade }) => {
-            const level = gameState.upgrades[key];
-            const maxLevel = upgrade.maxLevel;
-            const cost = getUpgradeCost(key);
-            const canBuy = gameState.coins >= cost && level < maxLevel;
-            
-            const item = document.createElement('div');
-            item.className = 'upgradeItem' + (level >= maxLevel ? ' maxed' : '');
-            
-            const upgradeName = document.createElement('div');
-            upgradeName.className = 'upgradeName';
-            upgradeName.innerHTML = `<span>${upgrade.name}</span><span>${cost} coins</span>`;
-            
-            const desc = document.createElement('div');
-            desc.className = 'upgradeDesc';
-            desc.textContent = upgrade.description;
-            
-            const levelInfo = document.createElement('div');
-            levelInfo.className = 'upgradeLevel';
-            levelInfo.textContent = `Level: ${level}/${maxLevel}`;
-            
-            const button = document.createElement('button');
-            button.className = 'upgradeButton' + (level >= maxLevel ? ' maxed' : '');
-            button.textContent = level >= maxLevel ? 'MAX LEVEL' : `Buy for ${cost} coins`;
-            button.disabled = !canBuy;
-            button.onclick = () => purchaseUpgrade(key);
-            
-            item.appendChild(upgradeName);
-            item.appendChild(desc);
-            item.appendChild(levelInfo);
-            item.appendChild(button);
-            
-            categoryContainer.appendChild(item);
-        });
+        const levelInfo = document.createElement('div');
+        levelInfo.className = 'upgradeLevel';
+        levelInfo.textContent = `Level: ${level}/${maxLevel}`;
         
-        upgradesList.appendChild(categoryContainer);
+        const button = document.createElement('button');
+        button.className = 'upgradeButton' + (level >= maxLevel ? ' maxed' : '');
+        button.textContent = level >= maxLevel ? 'MAX LEVEL' : `Buy for ${cost} coins`;
+        button.disabled = !canBuy;
+        button.onclick = () => purchaseUpgrade(key);
+        
+        item.appendChild(upgradeName);
+        item.appendChild(desc);
+        item.appendChild(levelInfo);
+        item.appendChild(button);
+        
+        categoryContainer.appendChild(item);
     });
+    
+    upgradesList.appendChild(categoryContainer);
 }
 
 // Show/Hide shop
