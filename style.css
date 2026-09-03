@@ -312,12 +312,16 @@ body {
 }
 
 .categoryTabs {
+    position: sticky;
+    top: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
     margin-bottom: 15px;
     padding: 10px 0;
     border-bottom: 2px solid #00ff88;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    z-index: 10;
 }
 
 .categoryTab {
