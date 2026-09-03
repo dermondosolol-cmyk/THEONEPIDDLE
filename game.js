@@ -1,4 +1,4 @@
-// Game Configuration
+add// Game Configuration
 let CANVAS_WIDTH = window.innerWidth;
 let CANVAS_HEIGHT = window.innerHeight;
 const ROAD_EDGE = 50;
@@ -123,6 +123,16 @@ for (let itemNumber = 1; itemNumber <= 180; itemNumber++) {
     };
 }
 
+// Music Playlist Configuration (Free Music)
+const MUSIC_TRACKS = [
+    { name: 'Neon Vibes', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+    { name: 'Electric Dreams', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+    { name: 'Retro Synth', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+    { name: 'Drift Kings', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+    { name: 'Night Speed', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+    { name: 'Highway Lights', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' }
+];
+
 // Game State
 let gameState = {
     coins: 0,
@@ -130,7 +140,8 @@ let gameState = {
     multiplier: 1,
     gameActive: false,
     upgrades: {},
-    selectedCategory: 'performance'
+    selectedCategory: 'performance',
+    currentMusicTrack: 0
 };
 
 let musicContext = null;
@@ -155,6 +166,7 @@ function loadGame() {
                 return upgrades;
             }, {});
             gameState.selectedCategory = data.selectedCategory || 'performance';
+            gameState.currentMusicTrack = data.currentMusicTrack || 0;
         } catch (error) {
             localStorage.removeItem('driftMasterGame');
         }
@@ -166,7 +178,8 @@ function saveGame() {
     localStorage.setItem('driftMasterGame', JSON.stringify({
         coins: gameState.coins,
         upgrades: gameState.upgrades,
-        selectedCategory: gameState.selectedCategory
+        selectedCategory: gameState.selectedCategory,
+        currentMusicTrack: gameState.currentMusicTrack
     }));
 }
 
@@ -356,7 +369,35 @@ function playMusicNote() {
 }
 
 function startMusic() {
-    if (!musicEnabled || musicContext) return;
+    if (!musicEnabled) return;
+
+    // Try to play selected track if available
+    let audioElement = document.getElementById('bgMusic');
+    if (!audioElement) {
+        audioElement = document.createElement('audio');
+        audioElement.id = 'bgMusic';
+        audioElement.loop = true;
+        audioElement.volume = 0.3;
+        document.body.appendChild(audioElement);
+    }
+    
+    const track = MUSIC_TRACKS[gameState.currentMusicTrack];
+    if (track) {
+        audioElement.src = track.url;
+        audioElement.play().catch(err => {
+            // Fallback to synth if streaming fails
+            console.log('Audio playback failed, using synth');
+            startSynthMusic();
+        });
+    } else {
+        startSynthMusic();
+    }
+    
+    document.getElementById('musicBtn').textContent = '♫ Music On';
+}
+
+function startSynthMusic() {
+    if (musicContext) return;
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return;
@@ -365,7 +406,6 @@ function startMusic() {
     musicContext.resume();
     playMusicNote();
     musicTimer = setInterval(playMusicNote, 250);
-    document.getElementById('musicBtn').textContent = '♫ Music On';
 }
 
 function stopMusic() {
@@ -377,6 +417,10 @@ function stopMusic() {
         musicContext.close();
         musicContext = null;
     }
+    const audioElement = document.getElementById('bgMusic');
+    if (audioElement) {
+        audioElement.pause();
+    }
 }
 
 function toggleMusic() {
@@ -387,6 +431,40 @@ function toggleMusic() {
         stopMusic();
     }
     document.getElementById('musicBtn').textContent = musicEnabled ? '♫ Music On' : '♫ Music Off';
+}
+
+// Change music track
+function changeMusic(trackIndex) {
+    gameState.currentMusicTrack = trackIndex;
+    saveGame();
+    if (musicEnabled) {
+        stopMusic();
+        startMusic();
+    }
+}
+
+// Show music selection menu
+function showMusicMenu() {
+    const modal = document.createElement('div');
+    modal.className = 'musicModal';
+    modal.innerHTML = `
+        <div class="musicMenuContent">
+            <div class="modalHeader">
+                <h2>🎵 Select Music Track</h2>
+                <button class="closeBtn" onclick="this.closest('.musicModal').remove()">✕</button>
+            </div>
+            <div class="musicTracks">
+                ${MUSIC_TRACKS.map((track, index) => `
+                    <button class="musicTrack ${index === gameState.currentMusicTrack ? 'active' : ''}" 
+                            onclick="changeMusic(${index}); document.querySelector('.musicModal').remove();">
+                        <div class="trackName">${track.name}</div>
+                        <div class="trackStatus">${index === gameState.currentMusicTrack ? '🎵 Now Playing' : 'Click to play'}</div>
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
 }
 
 // Game Engine
