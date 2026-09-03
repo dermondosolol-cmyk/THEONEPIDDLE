@@ -1,0 +1,439 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+#gameContainer {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    max-width: 1200px;
+    background: #000;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#gameContainer:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    max-width: none;
+    border-radius: 0;
+}
+
+#gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#gameUI {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+#topUI {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    z-index: 10;
+    pointer-events: auto;
+}
+
+#statsPanel {
+    display: flex;
+    gap: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 15px 20px;
+    border-radius: 8px;
+    width: fit-content;
+    border: 2px solid #00ff88;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+}
+
+.statLabel {
+    color: #00ff88;
+    font-weight: bold;
+}
+
+.statValue {
+    color: #fff;
+    font-size: 24px;
+    font-weight: bold;
+    min-width: 50px;
+    text-align: right;
+}
+
+.nitroStat {
+    min-width: 190px;
+}
+
+.nitroHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+}
+
+.nitroHeader .statValue {
+    font-size: 14px;
+    min-width: auto;
+}
+
+.nitroBar {
+    height: 12px;
+    overflow: hidden;
+    background: #222;
+    border: 1px solid #00ff88;
+    border-radius: 6px;
+}
+
+.nitroFill {
+    width: 0;
+    height: 100%;
+    background: linear-gradient(90deg, #00aaff, #00ff88);
+    transition: width 0.2s ease;
+}
+
+.nitroStatus {
+    display: block;
+    margin-top: 4px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0;
+    text-align: right;
+}
+
+.modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    pointer-events: auto;
+}
+
+.modal.hidden {
+    display: none;
+    pointer-events: none;
+}
+
+.modalContent {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    padding: 40px;
+    border-radius: 15px;
+    text-align: center;
+    border: 3px solid #00ff88;
+    max-width: 500px;
+    color: #fff;
+}
+
+.modalContent h1 {
+    font-size: 48px;
+    margin-bottom: 20px;
+    color: #00ff88;
+    text-shadow: 0 0 10px #00ff88;
+}
+
+.modalContent h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #00ff88;
+}
+
+.modalContent p {
+    font-size: 16px;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.controls {
+    background: rgba(0, 255, 136, 0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.controls p {
+    margin: 8px 0;
+}
+
+#gameOverStats {
+    background: rgba(0, 255, 136, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px 0;
+    text-align: left;
+    font-size: 18px;
+}
+
+#gameOverStats div {
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.startGameBtn {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    color: #000;
+    border: none;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 10px 5px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.startGameBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+}
+
+#controls {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    z-index: 10;
+    pointer-events: auto;
+    display: flex;
+    gap: 10px;
+}
+
+.controlBtn {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    color: #000;
+    border: none;
+    padding: 12px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.controlBtn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+}
+
+.panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: 350px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 2px solid #00ff88;
+    border-radius: 10px;
+    padding: 20px;
+    overflow-y: auto;
+    color: #fff;
+    z-index: 50;
+    pointer-events: auto;
+}
+
+.panel.hidden {
+    display: none;
+    pointer-events: none;
+}
+
+.panelHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #00ff88;
+    padding-bottom: 10px;
+}
+
+.panelHeader h2 {
+    color: #00ff88;
+    margin: 0;
+}
+
+.closeBtn {
+    background: #ff4444;
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closeBtn:hover {
+    background: #ff6666;
+}
+
+.coinsInfo {
+    background: rgba(0, 255, 136, 0.1);
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    border-left: 3px solid #00ff88;
+}
+
+.upgradesList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.upgradeItem {
+    background: rgba(0, 255, 136, 0.05);
+    border: 2px solid #00ff88;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upgradeItem:hover {
+    background: rgba(0, 255, 136, 0.15);
+    transform: translateX(5px);
+}
+
+.upgradeItem.maxed {
+    opacity: 0.6;
+    border-color: #888;
+}
+
+.upgradeItem.maxed:hover {
+    transform: none;
+}
+
+.upgradeName {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.upgradeName span:first-child {
+    color: #00ff88;
+}
+
+.upgradeName span:last-child {
+    color: #ffcc00;
+    font-size: 14px;
+}
+
+.upgradeDesc {
+    font-size: 12px;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+
+.upgradeLevel {
+    font-size: 12px;
+    color: #00ff88;
+    margin-bottom: 8px;
+}
+
+.upgradeButton {
+    background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+    color: #000;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    width: 100%;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.upgradeButton:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+.upgradeButton:disabled {
+    background: #666;
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.upgradeButton.maxed {
+    background: #00ff88;
+    color: #000;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .panel {
+        width: 100%;
+        right: auto;
+        left: 0;
+        top: auto;
+        bottom: 0;
+        border-radius: 10px 10px 0 0;
+        max-height: 70vh;
+    }
+
+    #statsPanel {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .nitroStat {
+        min-width: 0;
+    }
+
+    .modalContent {
+        padding: 30px 20px;
+        max-width: 90%;
+    }
+
+    #controls {
+        left: 10px;
+        right: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .controlBtn {
+        padding: 10px 12px;
+        font-size: 14px;
+    }
+}

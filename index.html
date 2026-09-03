@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drift Master - Upgrade Edition</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        
+        <div id="gameUI">
+            <div id="topUI">
+                <div id="statsPanel">
+                    <div class="stat">
+                        <span class="statLabel">Coins:</span>
+                        <span id="coinsDisplay" class="statValue">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="statLabel">Score:</span>
+                        <span id="scoreDisplay" class="statValue">0</span>
+                    </div>
+                    <div class="stat">
+                        <span class="statLabel">Multiplier:</span>
+                        <span id="multiplierDisplay" class="statValue">1x</span>
+                    </div>
+                    <div class="stat">
+                        <span class="statLabel">Speed:</span>
+                        <span id="speedDisplay" class="statValue">3.0</span>
+                    </div>
+                    <div class="nitroStat">
+                        <div class="nitroHeader">
+                            <span class="statLabel">Nitro Boost</span>
+                            <span id="nitroXP" class="statValue">0/100 XP</span>
+                        </div>
+                        <div class="nitroBar" aria-label="Nitro XP progress">
+                            <div id="nitroFill" class="nitroFill"></div>
+                        </div>
+                        <span id="nitroStatus" class="nitroStatus">COLLECT COINS</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="gameOver" class="modal hidden">
+                <div class="modalContent">
+                    <h2> You Crashed!</h2>
+                    <div id="gameOverStats"></div>
+                    <button onclick="startGame()">Play Again</button>
+                    <button onclick="showShop()">Go to Shop</button>
+                </div>
+            </div>
+
+            <div id="shopPanel" class="panel hidden">
+                <div class="panelHeader">
+                    <h2>Upgrade Shop</h2>
+                    <button class="closeBtn" onclick="hideShop()">✕</button>
+                </div>
+                <div class="coinsInfo">
+                    <span>Available Coins:</span>
+                    <span id="shopCoins">0</span>
+                </div>
+                <div id="upgradesList" class="upgradesList"></div>
+                <button class="startGameBtn" onclick="hideShop()">Back to Game</button>
+            </div>
+
+            <div id="startScreen" class="modal">
+                <div class="modalContent">
+                    <h1 id="startTitle">🏎️ Drift Master</h1>
+                    <p>Drift around obstacles and collect coins to upgrade your car!</p>
+                    <div class="controls">
+                        <p><strong>Controls:</strong></p>
+                        <p>← → or A/D to steer</p>
+                        <p>↑ ↓ or W/S to change speed</p>
+                        <p>SHIFT only jumps over obstacles</p>
+                        <p>SPACE uses a full XP nitro bar</p>
+                    </div>
+                    <button class="startGameBtn" onclick="startGame()">Start Game</button>
+                    <button class="startGameBtn" onclick="showShop()">View Shop</button>
+                </div>
+            </div>
+
+            <div id="controls">
+                <button id="shopBtn" onclick="showShop()" class="controlBtn">🛒 Shop</button>
+                <button id="musicBtn" onclick="toggleMusic()" class="controlBtn">♫ Music On</button>
+                <button id="fullscreenBtn" onclick="toggleFullscreen()" class="controlBtn">⛶ Fullscreen</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
